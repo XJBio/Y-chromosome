@@ -14,3 +14,12 @@ def get_args_sample_dir():
     parser.add_argument('-s', '--sample', type=str)
     args = parser.parse_args()
     return args
+
+def get_args_unialigner():
+    parser = argparse.ArgumentParser("指定输入路径和核数")
+    parser.add_argument('-t', '--thread', type=int)
+    parser.add_argument('--target', type=str)
+    parser.add_argument('--ref', type=str)
+    parser.add_argument('--output', type=str)
+    args = parser.parse_args()
+    return args
