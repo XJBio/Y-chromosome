@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 import re
 
 
-def plot_dotplot(cigar,out_fig):
+def plot_dotplot(cigar, out_fig):
     x = []
     y = []
     xpos = 0
@@ -25,6 +26,10 @@ def plot_dotplot(cigar,out_fig):
             ypos += length
 
     # 绘制点阵图
+    plt.figure(figsize=(10, 10))
+    ax = plt.gca()
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     plt.scatter(x, y, marker='o', s=1)
     plt.title("CIGAR Dotplot")
     plt.xlabel("Position in Target")
