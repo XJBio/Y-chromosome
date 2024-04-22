@@ -205,7 +205,7 @@ class UniAlignerWindows:
         chunk_path = save_chunks(chunks, self.tmp_path)
 
         """对划分后的结果进行处理"""
-        output_path = join_path(self.tmp_path, f'{shorter_seq.id}.{longer_seq.id}')
+        output_path = join_path(output_dir, f'{shorter_seq.id}.{longer_seq.id}')
         shorter_path = self.save_tmp_fasta(shorter_seq)
         check_and_make_path(output_path)
         for idx, slide in enumerate(chunks):
@@ -230,6 +230,7 @@ class UniAlignerWindows:
                     file.write(f"{col_info}\n")
             finally:
                 lock.release()  # 释放锁
+        print("remove tmp files")
         subprocess.run(f"rm -rf {output_path}", shell=True)
         for path in shorter_path:
             subprocess.run(f"rm -rf {path}", shell=True)
