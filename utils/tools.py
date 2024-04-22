@@ -223,8 +223,6 @@ class UniAlignerWindows:
             cmd = f"{self.exe_path} --first {shorter_path} --second {chunk_path[idx]} -o {output_path}"
             print(cmd)
             subprocess.run(cmd, shell=True)
-            if not os.path.exists(os.path.join(output_path, f"cigar_primary.txt")):
-                raise ValueError("No cigar file found!")
             with open(os.path.join(output_path, f"cigar_primary.txt"), "r") as file:
                 cigar_primary = file.read()
             with open(os.path.join(output_path, f"cigar.txt"), "r") as file:
