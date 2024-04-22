@@ -173,6 +173,14 @@ class UniAlignerExt:
         print('stdout:', results)
 
 
+def save_fasta(record, out_path):
+    save_path = os.path.join(out_path, f"{record.id}.fa")
+    if not os.path.exists(save_path):
+        with open(save_path, "w") as file:
+            SeqIO.write(record, file, "fasta")
+    return save_path
+
+
 class UniAlignerWindows:
     def __init__(self, exe_path, threads=1):
         self.tmp_path = None
@@ -255,10 +263,10 @@ class UniAlignerWindows:
         """基础参数设置"""
         record1, record2, output_dir, lock = params
 
-        record1_path = self.save_tmp_fasta(record1)
-        record2_path = self.save_tmp_fasta(record2)
         output_path = join_path(output_dir, f'{record1.id}.{record2.id}')
         tmp_fa_path = join_path(self.tmp_path, f'{record1.id}.{record2.id}')
+        record1_path = save_fasta(record1, tmp_fa_path)
+        record2_path = save_fasta(record2, tmp_fa_path)
 
         cmd = f"{self.exe_path} --first {record1_path} --second {record2_path} -o {output_path}"
         print(cmd)
@@ -285,7 +293,6 @@ class UniAlignerWindows:
         ref_fa = read_fasta(ref_fa)
         """构造tmp文件和输出文件夹的结构"""
         self.build_dir(output_dir)
-
         """依次处理query与ref对，对其子对齐采用多线程并行的方式"""
         lock = multiprocessing.Manager().Lock()
         task_list = [(record1, record2, output_dir, lock) for record1, record2 in itertools.product(query_fa, ref_fa)]
