@@ -250,7 +250,7 @@ class UniAlignerWindows:
             lock.acquire()
             try:
                 with open(join_path(output_dir, f"unialigner.paf"), "a") as file:
-                    file.write(f"{col_info}\n")
+                    file.write('\t'.join(col_info) + "\n")
             finally:
                 lock.release()  # 释放锁
             subprocess.run(f"rm -rf {chunk_path}", shell=True)
