@@ -83,6 +83,7 @@ def save_chunk(slide, save_path):
     print(f"Saved {filename}")
     return filename
 
+
 def load_cigar(output_path, name):
     path = os.path.join(output_path, name)
     if os.path.isfile(path):
@@ -248,6 +249,36 @@ class UniAlignerWindows:
         print("remove tmp files")
         subprocess.run(f"rm -rf {output_path}", shell=True)
 
+    def align_all(self, params):
+        print(params)
+
+        """基础参数设置"""
+        record1, record2, output_dir, lock = params
+
+        record1_path = self.save_tmp_fasta(record1)
+        record2_path = self.save_tmp_fasta(record2)
+        output_path = join_path(output_dir, f'{record1.id}.{record2.id}')
+        tmp_fa_path = join_path(self.tmp_path, f'{record1.id}.{record2.id}')
+
+        cmd = f"{self.exe_path} --first {record1_path} --second {record2_path} -o {output_path}"
+        print(cmd)
+        subprocess.run(cmd, shell=True)
+        cigar_primary = load_cigar(output_path, 'cigar_primary.txt')
+        cigar = load_cigar(output_path, 'cigar.txt')
+        cigar_recursive = load_cigar(output_path, 'cigar_recursive.txt')
+        col_info = [record1.id, len(record1), 0, len(record1),
+                    record2.id, len(record2), 0, len(record2),
+                    cigar_primary, cigar, cigar_recursive]
+        lock.acquire()
+        try:
+            with open(join_path(output_dir, f"unialigner.paf"), "a") as file:
+                file.write(f"{col_info}\n")
+        finally:
+            lock.release()  # 释放锁
+        print("remove tmp files")
+        subprocess.run(f"rm -rf {tmp_fa_path}", shell=True)
+        subprocess.run(f"rm -rf {output_path}", shell=True)
+
     def align(self, query_fa, ref_fa, output_dir):
         """加载query和ref序列，其中query与ref中有不止一个序列"""
         query_fa = read_fasta(query_fa)
@@ -259,5 +290,5 @@ class UniAlignerWindows:
         lock = multiprocessing.Manager().Lock()
         task_list = [(record1, record2, output_dir, lock) for record1, record2 in itertools.product(query_fa, ref_fa)]
         pool = multiprocessing.Pool(processes=self.threads)
-        results = pool.map(self.align_one_part, task_list)
+        results = pool.map(self.align_all, task_list)
         print(results)
