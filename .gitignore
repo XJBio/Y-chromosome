@@ -1,0 +1,6 @@
+*.txt
+*.error
+*.pbs
+*.csv
+*.tsv
+*.log
