@@ -231,3 +231,4 @@ class UniAlignerWindows:
 
         """依次处理query与ref对，对其子对齐采用多线程并行的方式"""
         task_list = [(record1, record2, output_dir) for record1, record2 in itertools.product(query_fa, ref_fa)]
+        
