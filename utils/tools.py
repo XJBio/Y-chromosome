@@ -186,7 +186,7 @@ class UniAlignerWindows:
         print(params)
 
         """基础参数设置"""
-        record1, record2, output_dir = params
+        record1, record2, output_dir, lock = params
         step_fraction = 0.5
 
         """将序列按长短进行划分"""
@@ -219,9 +219,15 @@ class UniAlignerWindows:
             with open(os.path.join(output_path, f"cigar_primary.txt"), "r") as file:
                 cigar = file.read()
             col_info = cigar_to_paf(query_name, len(shorter_seq), 0, target_name, len(longer_seq), start, cigar)
-            with open(join_path(output_dir, f"unialigner.paf"), "a") as file:
-                file.write(f"{col_info}\n")
+            lock.acquire()
+            try:
+                with open(join_path(output_dir, f"unialigner.paf"), "a") as file:
+                    file.write(f"{col_info}\n")
+            finally:
+                lock.release()  # 释放锁
         subprocess.run(f"rm -rf {output_path}", shell=True)
+        for path in shorter_path:
+            subprocess.run(f"rm -rf {path}", shell=True)
 
     def align(self, query_fa, ref_fa, output_dir):
         """加载query和ref序列，其中query与ref中有不止一个序列"""
@@ -231,7 +237,8 @@ class UniAlignerWindows:
         self.build_dir(output_dir)
 
         """依次处理query与ref对，对其子对齐采用多线程并行的方式"""
-        task_list = [(record1, record2, output_dir) for record1, record2 in itertools.product(query_fa, ref_fa)]
+        lock = multiprocessing.Manager().Lock()
+        task_list = [(record1, record2, output_dir, lock) for record1, record2 in itertools.product(query_fa, ref_fa)]
         pool = multiprocessing.Pool(processes=self.threads)
         results = pool.map(self.align_one_part, task_list)
         print(results)

@@ -4,3 +4,6 @@
 *.csv
 *.tsv
 *.log
+*.fa
+*.paf
+*.fasta
