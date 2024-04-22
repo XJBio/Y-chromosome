@@ -170,9 +170,8 @@ class UniAlignerWindows:
         check_and_make_path(self.tmp_path)
         with open(join_path(output, 'unialigner.paf'), 'w') as f:
             cols = ["Query.name", "Query.length", 'Query.start', 'Query.end',
-                    'strand',
                     'Target.name', 'Target.length', 'Target.start', 'Target.end',
-                    'align.matches', 'align.length', 'align.quality', 'align.cigar']
+                    'cigar_primary', 'cigar', 'cigar_recursive']
             f.write('\t'.join(cols) + '\n')
 
     def save_tmp_fasta(self, record):
@@ -217,8 +216,14 @@ class UniAlignerWindows:
             if not os.path.exists(os.path.join(output_path, f"cigar_primary.txt")):
                 raise ValueError("No cigar file found!")
             with open(os.path.join(output_path, f"cigar_primary.txt"), "r") as file:
+                cigar_primary = file.read()
+            with open(os.path.join(output_path, f"cigar.txt"), "r") as file:
                 cigar = file.read()
-            col_info = cigar_to_paf(query_name, len(shorter_seq), 0, target_name, len(longer_seq), start, cigar)
+            with open(os.path.join(output_path, f"cigar_recursive.txt"), "r") as file:
+                cigar_recursive = file.read()
+            col_info = [query_name, len(shorter_seq), 0, len(shorter_seq),
+                        target_name, len(longer_seq), start, end,
+                        cigar_primary, cigar, cigar_recursive]
             lock.acquire()
             try:
                 with open(join_path(output_dir, f"unialigner.paf"), "a") as file:
