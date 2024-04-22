@@ -1,7 +1,5 @@
 import pandas as pd
 import numpy as np
-import sys
-sys.path.append("/data/home/sjwan/projects/Y-chromosome/")
 from plot_func.plot_cigar import plot_dotplot
 import re
 
