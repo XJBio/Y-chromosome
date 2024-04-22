@@ -4,13 +4,13 @@ from plot_func.plot_cigar import plot_dotplot
 import re
 
 # cigar_tsv = '/home/sjwan/ESA/workflow/6_test_unialigner/temp/cigar.all.tsv'
-cigar_tsv = "E:/data/43Y/cigar.all.tsv"
-
-data = pd.read_csv(cigar_tsv, sep='\t', header=None)
-
-data.columns = ['query', 'target', 'cigar']
-
-data = data.sort_values(by=['query', 'target'])
+# cigar_tsv = "E:/data/43Y/cigar.all.tsv"
+#
+# data = pd.read_csv(cigar_tsv, sep='\t', header=None)
+#
+# data.columns = ['query', 'target', 'cigar']
+#
+# data = data.sort_values(by=['query', 'target'])
 
 
 def parse_cigar(cigar):
@@ -72,6 +72,9 @@ def calculate_match_percentage(cigar):
 
 
 # 示例使用
+with open("E:\data\\43Y\cigar_primary.txt",'r') as f:
+    cigar_string = f.read()
+
 # cigar_string = ""
 # query_name = "query_seq"
 # query_length = 100
@@ -82,10 +85,10 @@ def calculate_match_percentage(cigar):
 #
 # paf_output = cigar_to_paf(query_name, query_length, query_start, target_name, target_length, target_start, cigar_string)
 # print(paf_output)
-# plot_dotplot(cigar_string, 'show.png')
+plot_dotplot(cigar_string, 'E:\data\\43Y\show.png')
 # print(calculate_match_percentage(cigar_string))
-data[['Match Rate', 'Insert Rate', 'Delete Rate']] = data['cigar'].apply(lambda x: calculate_match_percentage(x)).apply(pd.Series)
-
-
-def plot_id_plot(id, frame):
-    plot_dotplot(frame.loc[764]['cigar'], f'show{id}.png')
+# data[['Match Rate', 'Insert Rate', 'Delete Rate']] = data['cigar'].apply(lambda x: calculate_match_percentage(x)).apply(pd.Series)
+#
+#
+# def plot_id_plot(id, frame):
+#     plot_dotplot(frame.loc[764]['cigar'], f'show{id}.png')
