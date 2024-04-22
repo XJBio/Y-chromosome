@@ -83,6 +83,14 @@ def save_chunk(slide, save_path):
     print(f"Saved {filename}")
     return filename
 
+def load_cigar(output_path, name):
+    path = os.path.join(output_path, name)
+    if os.path.isfile(path):
+        with open(path, "r") as file:
+            content = file.read()
+        return content
+    return ''
+
 
 class UniAligner:
 
@@ -214,21 +222,19 @@ class UniAlignerWindows:
 
         """对划分后的结果进行处理"""
         output_path = join_path(output_dir, f'{shorter_seq.id}.{longer_seq.id}')
-        check_and_make_path(output_path)
+        tmp_fa_path = join_path(self.tmp_path, f'{shorter_seq.id}.{longer_seq.id}')
+        check_and_make_path(tmp_fa_path)
         shorter_path = self.save_tmp_fasta(shorter_seq)
         check_and_make_path(output_path)
         for idx, slide in enumerate(chunks):
             chunk, start, end = slide
-            chunk_path = save_chunk(slide, output_path)
-            cmd = f"{self.exe_path} --first {shorter_path} --second {chunk_path[idx]} -o {output_path}"
+            chunk_path = save_chunk(slide, tmp_fa_path)
+            cmd = f"{self.exe_path} --first {shorter_path} --second {chunk_path} -o {output_path}"
             print(cmd)
             subprocess.run(cmd, shell=True)
-            with open(os.path.join(output_path, f"cigar_primary.txt"), "r") as file:
-                cigar_primary = file.read()
-            with open(os.path.join(output_path, f"cigar.txt"), "r") as file:
-                cigar = file.read()
-            with open(os.path.join(output_path, f"cigar_recursive.txt"), "r") as file:
-                cigar_recursive = file.read()
+            cigar_primary = load_cigar(output_path, 'cigar_primary.txt')
+            cigar = load_cigar(output_path, 'cigar.txt')
+            cigar_recursive = load_cigar(output_path, 'cigar_recursive.txt')
             col_info = [query_name, len(shorter_seq), 0, len(shorter_seq),
                         target_name, len(longer_seq), start, end,
                         cigar_primary, cigar, cigar_recursive]

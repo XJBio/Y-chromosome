@@ -23,3 +23,10 @@ def get_args_unialigner():
     parser.add_argument('--output', type=str)
     args = parser.parse_args()
     return args
+
+def plot_cigar_dotplot():
+    parser = argparse.ArgumentParser("指定输入路径和核数")
+    parser.add_argument('--file', type=str)
+    parser.add_argument('--output', type=str)
+    args = parser.parse_args()
+    return args

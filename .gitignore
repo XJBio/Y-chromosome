@@ -7,4 +7,6 @@
 *.fa
 *.paf
 *.fasta
-*.pyc
+__pycache__/
+*.py[cod]
+*.png

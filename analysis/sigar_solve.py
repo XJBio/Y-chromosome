@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
+import sys
+sys.path.append("/data/home/sjwan/projects/Y-chromosome")
 from plot_func.plot_cigar import plot_dotplot
+from utils.get_args import plot_cigar_dotplot
 import re
 
 # cigar_tsv = '/home/sjwan/ESA/workflow/6_test_unialigner/temp/cigar.all.tsv'
@@ -70,11 +73,12 @@ def calculate_match_percentage(cigar):
     delete_percentage = (delete_length / total_length) if total_length > 0 else 0
     return match_percentage, insert_percentage, delete_percentage
 
-
+if __name__ == '__main__':
+    args = plot_cigar_dotplot()
 # 示例使用
-with open("E:\data\\43Y\cigar_primary.txt",'r') as f:
-    cigar_string = f.read()
-
+    with open(args.file,'r') as f:
+        cigar_string = f.read()
+    plot_dotplot(cigar_string, args.output)
 # cigar_string = ""
 # query_name = "query_seq"
 # query_length = 100
@@ -85,7 +89,6 @@ with open("E:\data\\43Y\cigar_primary.txt",'r') as f:
 #
 # paf_output = cigar_to_paf(query_name, query_length, query_start, target_name, target_length, target_start, cigar_string)
 # print(paf_output)
-plot_dotplot(cigar_string, 'E:\data\\43Y\show.png')
 # print(calculate_match_percentage(cigar_string))
 # data[['Match Rate', 'Insert Rate', 'Delete Rate']] = data['cigar'].apply(lambda x: calculate_match_percentage(x)).apply(pd.Series)
 #
