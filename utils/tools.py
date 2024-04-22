@@ -3,7 +3,7 @@ import os
 import multiprocessing
 import itertools
 import subprocess
-from build_path import check_and_make_path, join_path
+from utils.build_path import check_and_make_path, join_path
 import re
 
 
@@ -168,12 +168,12 @@ class UniAlignerWindows:
         self.output_path = output
         self.tmp_path = join_path(output, 'tmp')
         check_and_make_path(self.tmp_path)
-        with open(join_path(output, 'output.paf'), 'w') as f:
+        with open(join_path(output, 'unialigner.paf'), 'w') as f:
             cols = ["Query.name", "Query.length", 'Query.start', 'Query.end',
                     'strand',
                     'Target.name', 'Target.length', 'Target.start', 'Target.end',
                     'align.matches', 'align.length', 'align.quality', 'align.cigar']
-            f.write('\t'.join(cols))
+            f.write('\t'.join(cols) + '\n')
 
     def save_tmp_fasta(self, record):
         save_path = os.path.join(self.tmp_path, f"{record.id}.fa")
@@ -212,6 +212,7 @@ class UniAlignerWindows:
         for idx, slide in enumerate(chunks):
             chunk, start, end = slide
             cmd = f"{self.exe_path} --first {shorter_path} --second {chunk_path[idx]} -o {output_path}"
+            print(cmd)
             subprocess.run(cmd, shell=True)
             if not os.path.exists(os.path.join(output_path, f"cigar_primary.txt")):
                 raise ValueError("No cigar file found!")
@@ -231,4 +232,6 @@ class UniAlignerWindows:
 
         """依次处理query与ref对，对其子对齐采用多线程并行的方式"""
         task_list = [(record1, record2, output_dir) for record1, record2 in itertools.product(query_fa, ref_fa)]
-        
+        pool = multiprocessing.Pool(processes=self.threads)
+        results = pool.map(self.align_one_part, task_list)
+        print(results)
