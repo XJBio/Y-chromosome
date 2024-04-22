@@ -76,6 +76,14 @@ def save_chunks(chunks, save_path):
     return chunk_path
 
 
+def save_chunk(slide, save_path):
+    chunk, start, end = slide
+    filename = join_path(save_path, f"{chunk.id}_{start}_{end}.fa")
+    SeqIO.write(chunk, filename, "fasta")
+    print(f"Saved {filename}")
+    return filename
+
+
 class UniAligner:
 
     def __init__(self, exc_path, max_thread=1):
@@ -202,14 +210,16 @@ class UniAlignerWindows:
         window_size = len(shorter_seq)
         step_size = int(window_size * step_fraction)
         chunks = sliding_split_sequence(longer_seq, window_size, step_size)
-        chunk_path = save_chunks(chunks, self.tmp_path)
+        # chunk_path = save_chunks(chunks, self.tmp_path)
 
         """对划分后的结果进行处理"""
         output_path = join_path(output_dir, f'{shorter_seq.id}.{longer_seq.id}')
+        check_and_make_path(output_path)
         shorter_path = self.save_tmp_fasta(shorter_seq)
         check_and_make_path(output_path)
         for idx, slide in enumerate(chunks):
             chunk, start, end = slide
+            chunk_path = save_chunk(slide, output_path)
             cmd = f"{self.exe_path} --first {shorter_path} --second {chunk_path[idx]} -o {output_path}"
             print(cmd)
             subprocess.run(cmd, shell=True)
@@ -230,10 +240,9 @@ class UniAlignerWindows:
                     file.write(f"{col_info}\n")
             finally:
                 lock.release()  # 释放锁
+            subprocess.run(f"rm -rf {chunk_path}", shell=True)
         print("remove tmp files")
         subprocess.run(f"rm -rf {output_path}", shell=True)
-        for path in shorter_path:
-            subprocess.run(f"rm -rf {path}", shell=True)
 
     def align(self, query_fa, ref_fa, output_dir):
         """加载query和ref序列，其中query与ref中有不止一个序列"""
