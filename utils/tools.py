@@ -264,7 +264,9 @@ class UniAlignerWindows:
         record1, record2, output_dir, lock = params
 
         output_path = join_path(output_dir, f'{record1.id}.{record2.id}')
+        check_and_make_path(output_path)
         tmp_fa_path = join_path(self.tmp_path, f'{record1.id}.{record2.id}')
+        check_and_make_path(tmp_fa_path)
         record1_path = save_fasta(record1, tmp_fa_path)
         record2_path = save_fasta(record2, tmp_fa_path)
 
@@ -277,10 +279,11 @@ class UniAlignerWindows:
         col_info = [record1.id, len(record1), 0, len(record1),
                     record2.id, len(record2), 0, len(record2),
                     cigar_primary, cigar, cigar_recursive]
+        col_info = [str(info) for info in col_info]
         lock.acquire()
         try:
             with open(join_path(output_dir, f"unialigner.paf"), "a") as file:
-                file.write(f"{col_info}\n")
+                file.write('\t'.join(col_info) + "\n")
         finally:
             lock.release()  # 释放锁
         print("remove tmp files")
@@ -299,3 +302,4 @@ class UniAlignerWindows:
         pool = multiprocessing.Pool(processes=self.threads)
         results = pool.map(self.align_all, task_list)
         print(results)
+        subprocess.run(f"rm -rf {self.tmp_path}", shell=True)
