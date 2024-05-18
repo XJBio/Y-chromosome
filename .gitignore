@@ -30,3 +30,6 @@ plot_func/__pycache__/plot_minimap.cpython-312.pyc
 *.bai
 *.bed
 *.pdf
+workflow.output/*
+nucfreq/*
+pbs/*

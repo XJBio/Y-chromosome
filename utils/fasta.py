@@ -23,3 +23,16 @@ def extract_Y(file_path, output_path):
         f.write(f">{Y_name}\n")
         f.write(hap1_Y + "\n")
 
+def search_contig(fa_data, contig_name):
+    for key in fa_data:
+        if contig_name in key:
+            return key, fa_data[key]
+    return 'N', 'X'
+
+def extract_contig(file_path, contig_name ,output_path):
+    Y_name, hap1_Y = search_contig(read_fasta(file_path), contig_name)
+    with open(
+        os.path.join(output_path), "w"
+    ) as f:
+        f.write(f">{Y_name}\n")
+        f.write(hap1_Y + "\n")
