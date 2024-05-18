@@ -149,11 +149,11 @@ class ScriptExecutor:
 
 
 class BaseSoftware:
+    EXE_PATH = {
+        'default': 'path/to/tools'
+    }
 
     def __init__(self, logger, version='default') -> None:
-        self.EXE_PATH = {
-            'default': 'path/to/tools'
-        }
 
         self.BASE_PARAMS = ['input', 'output', 'log', 'exe_params']
 
