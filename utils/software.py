@@ -150,8 +150,9 @@ class ScriptExecutor:
 
 class BaseSoftware:
     EXE_PATH = {
-            'default': 'path/to/tools'
-        }
+        'default': 'path/to/tools'
+    }
+
     def __init__(self, logger, version='default') -> None:
 
         self.BASE_PARAMS = ['input', 'output', 'log', 'exe_params']
@@ -221,11 +222,13 @@ class Workflow:
 
 
 class Minimap2_asm20(BaseSoftware):
+    EXE_PATH = {
+        'default': join_path(USER_BASE, 'miniconda3/envs/bio/bin/minimap2')
+    }
+
     def __init__(self, logger, version='default'):
         super().__init__(logger, version)
-        self.EXE_PATH = {
-            'default': join_path(USER_BASE, 'miniconda3/envs/bio/bin/minimap2')
-        }
+
         self.BASE_PARAMS = ['target', 'output', 'query', 'thread']
         self.BASE_CMD = '{exe_path} -t {thread} -x asm20 -Y --secondary=yes -N 1 --cs -c --paf-no-hit {target} {query} > {output}'
         self.RUN_PARAMS = {'target': '{path}/{name}.fa',
@@ -236,11 +239,13 @@ class Minimap2_asm20(BaseSoftware):
 
 
 class RagtagScaffoldDefaultMinimap(BaseSoftware):
+    EXE_PATH = {
+        'default': join_path(USER_BASE, 'miniconda3/envs/bio/bin/ragtag.py')
+    }
+
     def __init__(self, logger, version='default'):
         super().__init__(logger, version)
-        self.EXE_PATH = {
-            'default': join_path(USER_BASE, 'miniconda3/envs/bio/bin/ragtag.py')
-        }
+
         self.BASE_PARAMS = ['reference', 'query', 'output', 'thread']
         self.BASE_CMD = get_python_interpreter('bio') + ' {exe_path} scaffold  -t {thread} {reference} {query} -o {output} '
         self.RUN_PARAMS = {'reference': '{path}/{name}.fa',
@@ -251,11 +256,13 @@ class RagtagScaffoldDefaultMinimap(BaseSoftware):
 
 
 class Nucmer4(BaseSoftware):
+    EXE_PATH = {
+        'default': join_path(USER_BASE, 'tools/mummer/bin/nucmer')
+    }
+
     def __init__(self, logger, version='default'):
         super().__init__(logger, version)
-        self.EXE_PATH = {
-            'default': join_path(USER_BASE, 'tools/mummer/bin/nucmer')
-        }
+
         self.BASE_PARAMS = ['reference', 'query', 'threads', 'prefix']
         self.BASE_CMD = '{exe_path} -p {prefix} -t {threads} {reference} {query}'
         self.RUN_PARAMS = {'reference': '{path}/{name}.fa',
@@ -266,11 +273,13 @@ class Nucmer4(BaseSoftware):
 
 
 class Pbmm2_index(BaseSoftware):
+    EXE_PATH = {
+        'default': join_path(USER_BASE, 'miniconda3/envs/nucfreq/bin/pbmm2')
+    }
+
     def __init__(self, logger, version='default'):
         super().__init__(logger, version)
-        self.EXE_PATH = {
-            'default': join_path(USER_BASE, 'miniconda3/envs/nucfreq/bin/pbmm2')
-        }
+
         self.BASE_PARAMS = ['contig', 'mmi']
         self.BASE_CMD = '{exe_path} index {contig} {mmi}'
         self.RUN_PARAMS = {'contig': '{path}/{name}.fa',
@@ -279,11 +288,13 @@ class Pbmm2_index(BaseSoftware):
 
 
 class Pbmm2_align(BaseSoftware):
+    EXE_PATH = {
+        'default': join_path(USER_BASE, 'miniconda3/envs/nucfreq/bin/pbmm2')
+    }
+
     def __init__(self, logger, version='default'):
         super().__init__(logger, version)
-        self.EXE_PATH = {
-            'default': join_path(USER_BASE, 'miniconda3/envs/nucfreq/bin/pbmm2')
-        }
+
         self.BASE_PARAMS = ['thread', 'mmi', 'fofn', 'outbam']
         self.BASE_CMD = '{exe_path} align --log-level DEBUG --preset SUBREAD --min-length 5000 -j {thread} {mmi} {fofn} {outbam} '
         self.RUN_PARAMS = {'thread': '48',
@@ -294,11 +305,13 @@ class Pbmm2_align(BaseSoftware):
 
 
 class Samtools_view_2308(BaseSoftware):
+    EXE_PATH = {
+        'default': join_path(USER_BASE, 'miniconda3/envs/bio/bin/samtools')
+    }
+
     def __init__(self, logger, version='default'):
         super().__init__(logger, version)
-        self.EXE_PATH = {
-            'default': join_path(USER_BASE, 'miniconda3/envs/bio/bin/samtools')
-        }
+
         self.BASE_CMD = '{exe_path} view -@ {thread} -F 2308 -u -o {outbam} {inputbam}'
         self.BASE_PARAMS = ['thread', 'outbam', 'inputbam']
         self.RUN_PARAMS = {
@@ -309,11 +322,13 @@ class Samtools_view_2308(BaseSoftware):
 
 
 class Samtools_sort_bam(BaseSoftware):
+    EXE_PATH = {
+        'default': join_path(USER_BASE, 'miniconda3/envs/verkko2/bin/samtools')
+    }
+
     def __init__(self, logger, version='default'):
         super().__init__(logger, version)
-        self.EXE_PATH = {
-            'default': join_path(USER_BASE, 'miniconda3/envs/verkko2/bin/samtools')
-        }
+
         self.BASE_CMD = '{exe_path} sort -@ {thread} -o {outbam} {inputbam}'
         self.BASE_PARAMS = ['thread', 'outbam', 'inputbam']
         self.RUN_PARAMS = {
@@ -324,11 +339,13 @@ class Samtools_sort_bam(BaseSoftware):
 
 
 class Samtools_index_bam(BaseSoftware):
+    EXE_PATH = {
+        'default': join_path(USER_BASE, 'miniconda3/envs/verkko2/bin/samtools')
+    }
+
     def __init__(self, logger, version='default'):
         super().__init__(logger, version)
-        self.EXE_PATH = {
-            'default': join_path(USER_BASE, 'miniconda3/envs/verkko2/bin/samtools')
-        }
+
         self.BASE_CMD = '{exe_path} index -@ {thread} {inputbam}'
         self.BASE_PARAMS = ['thread', 'inputbam']
         self.RUN_PARAMS = {
@@ -338,11 +355,13 @@ class Samtools_index_bam(BaseSoftware):
 
 
 class VerityMap(BaseSoftware):
+    EXE_PATH = {
+        'default': join_path(USER_BASE, 'tools/VerityMap/veritymap/main.py')
+    }
+
     def __init__(self, logger, version='default'):
         super().__init__(logger, version)
-        self.EXE_PATH = {
-            'default': join_path(USER_BASE, 'tools/VerityMap/veritymap/main.py')
-        }
+
         self.BASE_CMD = get_python_interpreter(
             'bio') + ' {exe_path} -t {thread}  -o {output} -d {hifi} --reads {reads} {assembly1} {assembly2}'
         self.BASE_PARAMS = ['thread', 'output', 'hifi', 'reads', 'assembly1', 'assembly2']
