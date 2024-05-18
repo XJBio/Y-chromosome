@@ -18,7 +18,6 @@ def load_workflow(workflow, sample):
     ragtag.RUN_PARAMS['reference'] = reference
     ragtag.RUN_PARAMS['query'] = assembly
     ragtag.RUN_PARAMS['output'] = RAGTAG_OUTPUT
-    logger.info(ragtag.RUN_PARAMS)
     workflow.add_software(ragtag)
 
     
@@ -36,4 +35,4 @@ if __name__ == "__main__":
     ragtag_workflow = Workflow(logger)
     for sample in sample_list:
         load_workflow(ragtag_workflow, sample)
-    ragtag_workflow.run('DEBUG')   
+    ragtag_workflow.run('RUN')   

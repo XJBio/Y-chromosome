@@ -149,11 +149,10 @@ class ScriptExecutor:
 
 
 class BaseSoftware:
-
-    def __init__(self, logger, version='default') -> None:
-        self.EXE_PATH = {
+    EXE_PATH = {
             'default': 'path/to/tools'
         }
+    def __init__(self, logger, version='default') -> None:
 
         self.BASE_PARAMS = ['input', 'output', 'log', 'exe_params']
 
@@ -165,6 +164,7 @@ class BaseSoftware:
 
     def run(self, mode='RUN'):
         # 构建命令字符串
+        
         cmd = self.BASE_CMD.format(exe_path=self.exe, **self.RUN_PARAMS)
         # 执行命令或者仅打印命令
         if mode == 'RUN':
@@ -310,6 +310,7 @@ class Samtools_view_2308(BaseSoftware):
 
 
 class Samtools_sort_bam(BaseSoftware):
+    
     def __init__(self, logger, version='default'):
         super().__init__(logger, version)
         self.EXE_PATH = {
