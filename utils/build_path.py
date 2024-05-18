@@ -23,3 +23,10 @@ def join_and_make_path(dir_path, name):
     check_and_make_path(join_path(dir_path, name))
     return join_path(dir_path, name)
 
+
+def get_file_path_name(file_path):
+    return os.path.basename(file_path)
+
+
+def get_file_path_dir(file_path):
+    return os.path.dirname(file_path)
