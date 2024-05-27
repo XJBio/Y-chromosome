@@ -13,13 +13,13 @@ def parse_agp(agp_file):
             object_end = int(fields[2])
             part_number = int(fields[3])
             component_type = fields[4]
-            
+
             if component_type == 'W':
                 component_id = fields[5]
                 component_start = int(fields[6])
                 component_end = int(fields[7])
                 orientation = fields[8]
-                
+
                 contigs.append({
                     'object_name': object_name,
                     'object_start': object_start,
@@ -45,10 +45,12 @@ def parse_agp(agp_file):
                 })
     return pd.DataFrame(contigs)
 
+
 def read_fai(fai_path):
     """读取FAI文件，并返回DataFrame."""
     fai_df = pd.read_csv(fai_path, sep='\t', header=None, names=['contig', 'length', 'offset', 'linebases', 'linewidth'])
     return fai_df
+
 
 def split_contig(contig_name, length, max_size=5000000, overlap=0.25):
     """将长度超过max_size的contig分割成多个区域，并且重叠overlap比例."""
@@ -61,11 +63,13 @@ def split_contig(contig_name, length, max_size=5000000, overlap=0.25):
         start += step
     return regions
 
+
 def save_bed(regions, bed_path):
     """保存区域信息到BED文件."""
     with open(bed_path, 'w') as f:
         for contig, start, end in regions:
             f.write(f"{contig}\t{start}\t{end}\n")
+
 
 def process_fai(fai_path, bed_path, max_size=5000000, overlap=0.25):
     fai_df = read_fai(fai_path)
@@ -79,7 +83,7 @@ def process_fai(fai_path, bed_path, max_size=5000000, overlap=0.25):
         else:
             all_regions.append((contig_name, 0, length))
     save_bed(all_regions, bed_path)
-    
+
 
 def parse_paf(paf_file):
     data = []
@@ -99,7 +103,7 @@ def parse_paf(paf_file):
             alignment_block_length = int(fields[10])
             mapping_quality = int(fields[11])
             tags = {tag.split(':')[0]: tag.split(':')[2] for tag in fields[12:]}
-            
+
             data.append({
                 'query_name': query_name,
                 'query_length': query_length,
@@ -115,7 +119,7 @@ def parse_paf(paf_file):
                 'mapping_quality': mapping_quality,
                 **tags
             })
-    
+
     return pd.DataFrame(data)
 
 

@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.patches as patches
 import os
 
+
 def parse_fai(fai_file):
     regions = []
     total_length = 0
@@ -24,6 +25,7 @@ def parse_fai(fai_file):
             })
     return pd.DataFrame(regions)
 
+
 def parse_paf(paf_file):
     data = []
     with open(paf_file, 'r') as f:
@@ -42,7 +44,7 @@ def parse_paf(paf_file):
             alignment_block_length = int(fields[10])
             mapping_quality = int(fields[11])
             tags = {tag.split(':')[0]: tag.split(':')[2] for tag in fields[12:]}
-            
+
             data.append({
                 'query_name': query_name,
                 'query_length': query_length,
@@ -58,8 +60,9 @@ def parse_paf(paf_file):
                 'mapping_quality': mapping_quality,
                 **tags
             })
-    
+
     return pd.DataFrame(data)
+
 
 def parse_agp(agp_file):
     contigs = []
@@ -73,13 +76,13 @@ def parse_agp(agp_file):
             object_end = int(fields[2])
             part_number = int(fields[3])
             component_type = fields[4]
-            
+
             if component_type == 'W':
                 component_id = fields[5]
                 component_start = int(fields[6])
                 component_end = int(fields[7])
                 orientation = fields[8]
-                
+
                 contigs.append({
                     'object_name': object_name,
                     'object_start': object_start,
@@ -107,11 +110,10 @@ def parse_agp(agp_file):
 
 
 def plot_alignment(fai_df, paf_df, agp_df, output_image):
-    
     contig_region_width = 0.2
     coverage_region_width = 0.2
-    fontsize=16
-    
+    fontsize = 16
+
     fig, ax = plt.subplots(figsize=(15, 5))
 
     # 预定义颜色映射
@@ -120,22 +122,27 @@ def plot_alignment(fai_df, paf_df, agp_df, output_image):
     # 绘制参考序列的区域分布
     for idx, row in fai_df.iterrows():
         color = colors(idx / len(fai_df))
-        ax.add_patch(patches.Rectangle((row['start'], 2.0+coverage_region_width), row['length'], contig_region_width, edgecolor=color, facecolor=color, label=row['region_name'] if idx == 0 else ""))
+        ax.add_patch(patches.Rectangle((row['start'], 2.0 + coverage_region_width), row['length'], contig_region_width, edgecolor=color,
+                                       facecolor=color, label=row['region_name'] if idx == 0 else ""))
 
     # 绘制参考序列的覆盖分布（灰色表示未覆盖区域）
     for idx, row in fai_df.iterrows():
-        ax.add_patch(patches.Rectangle((row['start'], 2.0), row['length'], coverage_region_width, edgecolor='none', facecolor='grey', alpha=0.1))
+        ax.add_patch(
+            patches.Rectangle((row['start'], 2.0), row['length'], coverage_region_width, edgecolor='none', facecolor='grey', alpha=0.1))
 
     # 绘制组装的contigs分布
     for idx, row in agp_df.iterrows():
         if row['component_type'] == 'W':
             color = colors(idx % len(fai_df) / len(fai_df))  # 使用相同的颜色映射
-            ax.add_patch(patches.Rectangle((row['object_start'], 1-coverage_region_width-contig_region_width), row['object_end'] - row['object_start'], contig_region_width, edgecolor=color, facecolor=color, label=row['component_id'] if idx == 0 else ""))
+            ax.add_patch(patches.Rectangle((row['object_start'], 1 - coverage_region_width - contig_region_width),
+                                           row['object_end'] - row['object_start'], contig_region_width, edgecolor=color, facecolor=color,
+                                           label=row['component_id'] if idx == 0 else ""))
 
     # 绘制组装的覆盖分布（灰色表示未覆盖区域）
     for idx, row in agp_df.iterrows():
         if row['component_type'] == 'W':
-            ax.add_patch(patches.Rectangle((row['object_start'], 1-coverage_region_width), row['object_end'] - row['object_start'], coverage_region_width, edgecolor='none', facecolor='grey', alpha=0.1))
+            ax.add_patch(patches.Rectangle((row['object_start'], 1 - coverage_region_width), row['object_end'] - row['object_start'],
+                                           coverage_region_width, edgecolor='none', facecolor='grey', alpha=0.1))
 
     # 绘制比对区间之间的连线并填充颜色
     for idx, row in paf_df.iterrows():
@@ -144,37 +151,42 @@ def plot_alignment(fai_df, paf_df, agp_df, output_image):
         target_end = target_row['start'] + row['target_end']
         query_start = row['query_start']
         query_end = row['query_end']
-        
+
         if row['strand'] == '+':
             line_color = 'red'
         else:
             line_color = 'blue'
 
         # 绘制覆盖行中的比对区域
-        ax.add_patch(patches.Rectangle((target_start, 2.0), target_end - target_start, coverage_region_width, edgecolor='none', facecolor=line_color, alpha=0.5))
-        ax.add_patch(patches.Rectangle((query_start, 1-coverage_region_width), query_end - query_start, coverage_region_width, edgecolor='none', facecolor=line_color, alpha=0.5))
+        ax.add_patch(
+            patches.Rectangle((target_start, 2.0), target_end - target_start, coverage_region_width, edgecolor='none', facecolor=line_color,
+                              alpha=0.5))
+        ax.add_patch(
+            patches.Rectangle((query_start, 1 - coverage_region_width), query_end - query_start, coverage_region_width, edgecolor='none',
+                              facecolor=line_color, alpha=0.5))
 
         # 绘制连线并填充梯形区域
         verts = [(target_start, 2.0), (target_end, 2.0), (query_end, 1.0), (query_start, 1.0)]
         poly = patches.Polygon(verts, closed=True, edgecolor=line_color, facecolor=line_color, alpha=0.1)
         ax.add_patch(poly)
-        
+
         # 突出显示连线
         ax.plot([target_start, query_start], [2.0, 1.00], color=line_color, lw=1, alpha=0.7)
         ax.plot([target_end, query_end], [2.0, 1.00], color=line_color, lw=1, alpha=0.7)
 
     ax.set_ylim(0, 3)
-    ax.set_yticks([1-coverage_region_width-contig_region_width/2,
-                   1-coverage_region_width/2, 
-                   2+coverage_region_width/2, 
-                   2+coverage_region_width+contig_region_width/2])
+    ax.set_yticks([1 - coverage_region_width - contig_region_width / 2,
+                   1 - coverage_region_width / 2,
+                   2 + coverage_region_width / 2,
+                   2 + coverage_region_width + contig_region_width / 2])
     ax.set_yticklabels(['Assembly', 'Assembly Coverage', 'Reference Coverage', 'Reference'], fontsize=fontsize)
-    ax.set_xlabel('Genomic Position', fontsize=fontsize+4)
-    ax.set_title('Alignment of Assembly to Reference', fontsize=fontsize+4)
+    ax.set_xlabel('Genomic Position', fontsize=fontsize + 4)
+    ax.set_title('Alignment of Assembly to Reference', fontsize=fontsize + 4)
     # ax.legend()
     plt.tight_layout()
     plt.savefig(output_image)
     plt.show()
+
 
 def main(fa_name):
     fai_file = '/data/home/sjwan/projects/Y-chromosome/workflow.output/data/T2T_Y_subregion.fa.fai'
@@ -184,22 +196,23 @@ def main(fa_name):
 
     # 解析 FAI 文件
     fai_df = parse_fai(fai_file)
-    
+
     # 解析 PAF 文件
     paf_df = parse_paf(paf_file)
-    paf_df = paf_df[paf_df['mapping_quality']>=60]
+    paf_df = paf_df[paf_df['mapping_quality'] >= 60]
     # 解析 AGP 文件
     agp_df = parse_agp(agp_file)
-    agp_df = agp_df[agp_df['object_name']=='chrY_RagTag']
+    agp_df = agp_df[agp_df['object_name'] == 'chrY_RagTag']
     # 绘制比对图
     plot_alignment(fai_df, paf_df, agp_df, output_image)
 
+
 if __name__ == '__main__':
-    data_dir  = '/data/home/sjwan/projects/Y-chromosome/workflow.output/data/verkko1.4'
+    data_dir = '/data/home/sjwan/projects/Y-chromosome/workflow.output/data/verkko1.4'
     sample_list = os.listdir(data_dir)
     sample_list.sort()
     sample_list = sample_list[::-1]
     depth_files = []
-    
+
     for sample in sample_list:
         main(sample)
