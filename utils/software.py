@@ -52,7 +52,6 @@ def parse_conda_envs(envs_output):
     interpreter_paths = {}
     lines = envs_output.strip().split('\n')
     for line in lines:
-        print(f"Parsing line: {line}")  # 调试信息
         if line.startswith('#') or line.strip() == "":
             continue
         parts = line.split()
@@ -184,11 +183,13 @@ class BaseSoftware:
             # 执行命令并捕获输出
             result = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True, encoding='utf-8', errors='replace')
             self.logger.info(f"Command output:\n{result.stdout}")
+            # self.logger.warning(f"Command error output:\n{result.stderr}")
             if result.stderr:
                 self.logger.warning(f"Command error output:\n{result.stderr}")
             return result.stdout
         except subprocess.CalledProcessError as e:
             # 记录错误并抛出异常
+            
             self.logger.error(f"{self.__class__.__name__} execution failed: {cmd}")
             self.logger.error(f"Error output:\n{e.stderr}")
             raise e
@@ -212,13 +213,16 @@ class Workflow:
 
     def run(self, mode='RUN'):
         self.logger.info("start workflow")
-        for task in self.tasks:
+        for i,  task in enumerate(self.tasks):
+            
             if isinstance(task, ScriptExecutor):
                 task.run(mode)
             elif isinstance(task, BaseSoftware):
                 task.run(mode)
             else:
                 self.logger.error("Unknown task type.")
+                return
+            self.logger.info(f"task finished {i+1}/{len(self.tasks)}")
 
 
 class Minimap2_asm20(BaseSoftware):
@@ -320,6 +324,38 @@ class Samtools_view_2308(BaseSoftware):
             'inputbam': '{path}/{name}.bam'
         }
 
+class Samtools_view_name(BaseSoftware):
+    EXE_PATH = {
+        'default': join_path(USER_BASE, 'miniconda3/envs/bio/bin/samtools')
+    }
+
+    def __init__(self, logger, version='default'):
+        super().__init__(logger, version)
+
+        self.BASE_CMD = '{exe_path} view -@ {thread}  -b {inputbam} {name} > {outbam}'
+        self.BASE_PARAMS = ['name', 'outbam', 'thread','inputbam']
+        self.RUN_PARAMS = {
+            'thread': '4',
+            'name': 'name',
+            'outbam': '{path}/{name}.bam',
+            'inputbam': '{path}/{name}.bam'
+        }
+
+class Samtools_depth(BaseSoftware):
+    EXE_PATH = {
+        'default': join_path(USER_BASE, 'miniconda3/envs/bio/bin/samtools')
+    }
+
+    def __init__(self, logger, version='default'):
+        super().__init__(logger, version)
+
+        self.BASE_CMD = '{exe_path} depth -a {inputbam} > {depth}'
+        self.BASE_PARAMS = ['depth', 'inputbam']
+        self.RUN_PARAMS = {
+            'inputbam': '{path}/{name}.bam',
+            'depth': '{path}/{name}.depth'
+        }
+
 
 class Samtools_sort_bam(BaseSoftware):
     EXE_PATH = {
@@ -363,13 +399,31 @@ class VerityMap(BaseSoftware):
         super().__init__(logger, version)
 
         self.BASE_CMD = get_python_interpreter(
-            'bio') + ' {exe_path} -t {thread}  -o {output} -d {hifi} --reads {reads} {assembly1} {assembly2}'
-        self.BASE_PARAMS = ['thread', 'output', 'hifi', 'reads', 'assembly1', 'assembly2']
+            'bio') + ' {exe_path} -t {thread}  -o {output} -d {hifi} --reads {reads} {assembly}'
+        self.BASE_PARAMS = ['thread', 'output', 'hifi', 'reads', 'assembly']
         self.RUN_PARAMS = {
             'thread': '4',
             'output': '{path}/{name}',
             'hifi': 'hifi-diploid',
             'reads': '{path}/{name}',
-            'assembly1': '{path}/{name}.fa',
-            'assembly2': '{path}/{name}.fa'
+            'assembly': '{path}/{name}.fa'
+        }
+
+
+class Nucflag(BaseSoftware):
+    EXE_PATH = {
+        'default': join_path(USER_BASE, 'tools/NucFlag/venv/bin/nucflag')
+    }
+    def __init__(self, logger, version='default'):
+        super().__init__(logger, version)
+        self.BASE_CMD = '{exe_path} -i {contigbam} -b {region} -c {toml} -d {imgout} -o {misasm} -s {status} -t {thread} -p {thread}'
+        self.BASE_PARAMS = ['thread', 'contigbam', 'region', 'toml', 'imgout','misasm','status']
+        self.RUN_PARAMS = {
+            'thread': '4',
+            'contigbam': '{path}/{name}.bam',
+            'region': '{path}/{name}.bed',
+            'toml': '{path}/{name}.toml',
+            'imgout': '{path}/{name}',
+            'misasm': '{path}/{name}.bed',
+            'status': '{path}/{name}.bed',
         }

@@ -7,23 +7,24 @@ from utils.build_path import *
 
 def load_workflow(workflow, sample):
     # 路径
-    fofn = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/data/verkko1.4/{sample}/assembly.fofn'
-    assembly1 = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/data/verkko1.4/{sample}/assembly.haplotype1.fasta'
-    assembly2 = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/data/verkko1.4/{sample}/assembly.haplotype2.fasta'
-    with open(fofn, 'r') as f:
-        reads_list = f.readlines()
+    fofn = f'/data/home/xfyang/CHN_Multi_Ethnic/{sample}/hifi_raw_fq/'
+    assembly = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/data/verkko1.4/{sample}/assembly.fasta'
+    # assembly2 = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/data/verkko1.4/{sample}/assembly.haplotype2.fasta'
+    fq_list = os.listdir(fofn)
 
     OUTPUT_DIR = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}'
-    VERITYMAP_OUTPUT = join_path(OUTPUT_DIR, 'veritymap')
+    check_and_make_path(OUTPUT_DIR)
+    VERITYMAP_OUTPUT = join_and_make_path(OUTPUT_DIR, 'veritymap')
 
-    for read in reads_list:
-        veritymap = VerityMap(logger)
-        veritymap.RUN_PARAMS['thread'] = '48'
-        veritymap.RUN_PARAMS['output'] = VERITYMAP_OUTPUT
-        veritymap.RUN_PARAMS['reads'] = read.rstrip()
-        veritymap.RUN_PARAMS['assembly1'] = assembly1
-        veritymap.RUN_PARAMS['assembly2'] = assembly2
-        workflow.add_software(veritymap)
+    for read in fq_list:
+        if '.fastq.gz' in read:
+            veritymap = VerityMap(logger)
+            veritymap.RUN_PARAMS['thread'] = '48'
+            veritymap.RUN_PARAMS['output'] = VERITYMAP_OUTPUT
+            veritymap.RUN_PARAMS['reads'] = join_path(fofn, read.rstrip())
+            veritymap.RUN_PARAMS['assembly'] = assembly
+            logger.info(veritymap.RUN_PARAMS)
+            workflow.add_software(veritymap)
 
     
 

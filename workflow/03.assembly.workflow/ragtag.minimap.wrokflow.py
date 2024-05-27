@@ -11,7 +11,8 @@ def load_workflow(workflow, sample):
     reference = '/data/home/sjwan/projects/Y-chromosome/workflow.output/data/chm13v2.0.fa'
 
     OUTPUT_DIR = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}'
-    RAGTAG_OUTPUT = join_path(OUTPUT_DIR, 'ragtag')
+    check_and_make_path(OUTPUT_DIR)
+    RAGTAG_OUTPUT = join_and_make_path(OUTPUT_DIR, 'ragtag')
 
     ragtag = RagtagScaffoldDefaultMinimap(logger)
     ragtag.RUN_PARAMS['thread'] = '80'

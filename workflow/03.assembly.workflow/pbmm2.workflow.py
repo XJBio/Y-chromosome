@@ -47,7 +47,6 @@ def load_workflow(workflow, FA_NAME):
     samtools_index.RUN_PARAMS['inputbam'] = sortbam
     
     
-    
     workflow.add_software(pbmm2_index)
     workflow.add_software(pbmm2_align)
     workflow.add_software(samtools_view_2308)
