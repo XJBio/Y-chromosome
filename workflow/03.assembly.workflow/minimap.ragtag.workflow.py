@@ -29,7 +29,7 @@ def load_workflow(workflow, sample):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="subregion for a FA type.")
+    parser = argparse.ArgumentParser(description="minimap for a FA type.")
     parser.add_argument("log", type=str, help="Path to save the log file")
 
     args = parser.parse_args()
