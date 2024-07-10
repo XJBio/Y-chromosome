@@ -3,28 +3,42 @@ import argparse
 sys.path.append("/data/home/sjwan/projects/Y-chromosome/")
 from utils.software import *
 from utils.build_path import *
+import gzip
+import shutil
+
+def read_fofn(fofn_path):
+    """
+    读取fofn文件，返回文件路径列表
+    """
+    with open(fofn_path, 'r') as f:
+        files = f.read().strip().split('\n')
+    return files
+
+def merge_fastq_files_with_system_tools(output_fastq, input_fastq_files):
+    with open(output_fastq, 'wb') as f_out:
+        for fastq_file in input_fastq_files:
+            subprocess.run(['zcat', fastq_file], stdout=f_out)
+        subprocess.run(['gzip', output_fastq])
 
 
 def load_workflow(workflow, sample):
     # 路径
-    fofn = f'/data/home/xfyang/CHN_Multi_Ethnic/{sample}/hifi_raw_fq/'
+    fq = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/data/verkko1.4/{sample}/reads.minimap.Y.fq'
+    # assembly = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/ragtag/Y.contigs.fasta'
     assembly = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/data/verkko1.4/{sample}/assembly.fasta'
-    # assembly2 = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/data/verkko1.4/{sample}/assembly.haplotype2.fasta'
-    fq_list = os.listdir(fofn)
-
-    OUTPUT_DIR = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}'
-    check_and_make_path(OUTPUT_DIR)
-    VERITYMAP_OUTPUT = join_and_make_path(OUTPUT_DIR, 'veritymap')
-
-    for read in fq_list:
-        if '.fastq.gz' in read:
-            veritymap = VerityMap(logger)
-            veritymap.RUN_PARAMS['thread'] = '48'
-            veritymap.RUN_PARAMS['output'] = VERITYMAP_OUTPUT
-            veritymap.RUN_PARAMS['reads'] = join_path(fofn, read.rstrip())
-            veritymap.RUN_PARAMS['assembly'] = assembly
-            logger.info(veritymap.RUN_PARAMS)
-            workflow.add_software(veritymap)
+    TEMP_OUTPUT = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/'
+    VERITYMAP_OUTPUT = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/veritymap'
+    check_and_make_path(VERITYMAP_OUTPUT)
+    # merge_fastq_files_with_system_tools(tmp_fq, fq_list)
+    
+    
+    veritymap = VerityMap(logger)
+    veritymap.RUN_PARAMS['thread'] = '48'
+    veritymap.RUN_PARAMS['output'] = VERITYMAP_OUTPUT
+    veritymap.RUN_PARAMS['reads'] = fq
+    veritymap.RUN_PARAMS['assembly'] = assembly
+    logger.info(veritymap.RUN_PARAMS)
+    workflow.add_software(veritymap)
 
     
 
@@ -35,6 +49,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     data_dir  = '/data/home/sjwan/projects/Y-chromosome/workflow.output/data/verkko1.4'
     sample_list = os.listdir(data_dir)
+    sample_list.sort()
     logger = setup_logger(args.log)
     
     veritymap_flow = Workflow(logger)

@@ -7,20 +7,21 @@ from utils.fasta import extract_Y
 
 def load_workflow(workflow, sample):
     # 路径
-    assembly = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/ragtag/ragtag.scaffold.fasta'
-    assembly_Y = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/ragtag/ragtag.scaffold.Y.fasta'
-    subregion_T2T_Y = '/data/home/sjwan/projects/Y-chromosome/workflow.output/data/T2T_Y_subregion.fa'
+    # assembly = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/ragtag/ragtag.scaffold.fasta'
+    # assembly_Y = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/ragtag/ragtag.scaffold.Y.fasta'
+    Y_contigs = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/ragtag/Y.contigs.fasta'
+    subregion_T2T_Y = '/data/home/sjwan/projects/Y-chromosome/workflow.output/data/T2TY.fa'
     # assembly2 = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/data/verkko1.4/{sample}/assembly.haplotype2.fasta'
 
-    extract_Y(assembly, assembly_Y)
+    # extract_Y(assembly, assembly_Y)
 
-    OUTPUT_DIR = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/subregion.minimap'
-    os.system(f'rm -rf {OUTPUT_DIR}')
+    OUTPUT_DIR = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/minimap.subregion.Ycontigs'
+    # os.system(f'rm -rf {OUTPUT_DIR}')
     check_and_make_path(OUTPUT_DIR)
-    PAF_OUTPUT = join_path(OUTPUT_DIR, 'subregion.minimap.paf')
+    PAF_OUTPUT = join_path(OUTPUT_DIR, 'T2T.minimap.paf')
     minimap_ragtag2reference = Minimap2_asm20(logger)
     minimap_ragtag2reference.RUN_PARAMS['target'] = subregion_T2T_Y
-    minimap_ragtag2reference.RUN_PARAMS['query'] = assembly_Y
+    minimap_ragtag2reference.RUN_PARAMS['query'] = Y_contigs
     minimap_ragtag2reference.RUN_PARAMS['output'] = PAF_OUTPUT
     minimap_ragtag2reference.RUN_PARAMS['thread'] = '48'
     workflow.add_software(minimap_ragtag2reference)

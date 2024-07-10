@@ -3,17 +3,19 @@ import pandas as pd
 def parse_fai(file_path):
     
     regions = {}
+    region_start = 1
     with open(file_path, 'r') as file:
         for line in file:
             fields = line.strip().split('\t')
             region_name = fields[0]
             region_length = int(fields[1])
-            region_start = int(fields[2])
+            # region_start = int(fields[2])
             regions[region_name] = {
                 "start": region_start,
                 "end": region_start + region_length - 1,
                 "length": region_length
             }
+            region_start += region_length
     return regions
 
 def parse_and_filter_paf(file_path):

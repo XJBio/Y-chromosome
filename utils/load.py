@@ -49,6 +49,17 @@ def parse_agp(agp_file):
 def read_fai(fai_path):
     """读取FAI文件，并返回DataFrame."""
     fai_df = pd.read_csv(fai_path, sep='\t', header=None, names=['contig', 'length', 'offset', 'linebases', 'linewidth'])
+    starts = []
+    ends = []
+    start = 1
+    end = 0
+    for idx, row in fai_df.iterrows():
+        end = start + row['length']
+        starts.append(start)
+        ends.append(end)
+        start = end + 1
+    fai_df['start'] = starts
+    fai_df['end'] = ends 
     return fai_df
 
 
