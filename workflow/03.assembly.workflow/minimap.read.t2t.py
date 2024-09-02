@@ -68,7 +68,7 @@ def load_workflow(workflow, sample):
     samtools_bam2fq.RUN_PARAMS["thread"] = "48"
     samtools_bam2fq.RUN_PARAMS["inputbam"] = Y_bam
     samtools_bam2fq.RUN_PARAMS["outputfq"] = Y_reads
-    workflow.add_software(samtools_bam2fq)
+    # workflow.add_software(samtools_bam2fq)
     
     remove = Remove(logger)
     remove.RUN_PARAMS["files"] = sam
@@ -80,11 +80,11 @@ def load_workflow(workflow, sample):
     
     remove = Remove(logger)
     remove.RUN_PARAMS["files"] = sort_bam
-    # workflow.add_software(remove)
+    workflow.add_software(remove)
     
     remove = Remove(logger)
     remove.RUN_PARAMS["files"] = sort_bam+'.bai'
-    # workflow.add_software(remove)
+    workflow.add_software(remove)
     
     
 

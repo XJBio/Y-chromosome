@@ -21,3 +21,6 @@ plot_func/__pycache__/plot_cigar.cpython-38.pyc
 workflow.output/*
 nucfreq/*
 pbs/*
+*.fai
+data/*
+output/*

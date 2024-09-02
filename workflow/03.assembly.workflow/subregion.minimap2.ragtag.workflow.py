@@ -10,7 +10,7 @@ def load_workflow(workflow, sample):
     # assembly = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/ragtag/ragtag.scaffold.fasta'
     # assembly_Y = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/ragtag/ragtag.scaffold.Y.fasta'
     Y_contigs = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/ragtag/Y.contigs.fasta'
-    subregion_T2T_Y = '/data/home/sjwan/projects/Y-chromosome/workflow.output/data/T2TY.fa'
+    subregion_T2T_Y = '/data/home/sjwan/projects/Y-chromosome/workflow.output/data/T2T_Y_subregion.fa'
     # assembly2 = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/data/verkko1.4/{sample}/assembly.haplotype2.fasta'
 
     # extract_Y(assembly, assembly_Y)
@@ -18,8 +18,8 @@ def load_workflow(workflow, sample):
     OUTPUT_DIR = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/minimap.subregion.Ycontigs'
     # os.system(f'rm -rf {OUTPUT_DIR}')
     check_and_make_path(OUTPUT_DIR)
-    PAF_OUTPUT = join_path(OUTPUT_DIR, 'T2T.minimap.paf')
-    minimap_ragtag2reference = Minimap2_asm20(logger)
+    PAF_OUTPUT = join_path(OUTPUT_DIR, 'subregion.minimap.asm5.paf')
+    minimap_ragtag2reference = Minimap2_asm5(logger)
     minimap_ragtag2reference.RUN_PARAMS['target'] = subregion_T2T_Y
     minimap_ragtag2reference.RUN_PARAMS['query'] = Y_contigs
     minimap_ragtag2reference.RUN_PARAMS['output'] = PAF_OUTPUT

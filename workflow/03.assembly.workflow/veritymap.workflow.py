@@ -25,7 +25,7 @@ def load_workflow(workflow, sample):
     # 路径
     fq = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/data/verkko1.4/{sample}/reads.minimap.Y.fq'
     # assembly = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/ragtag/Y.contigs.fasta'
-    assembly = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/data/verkko1.4/{sample}/assembly.fasta'
+    assembly = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/ragtag/Y.contigs.fasta'
     TEMP_OUTPUT = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/'
     VERITYMAP_OUTPUT = f'/data/home/sjwan/projects/Y-chromosome/workflow.output/03.assembly.workflow/{sample}/veritymap'
     check_and_make_path(VERITYMAP_OUTPUT)

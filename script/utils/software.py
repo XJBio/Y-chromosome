@@ -279,6 +279,21 @@ class Minimap2_asm20(BaseSoftware):
             "output": "{path}/{name}.paf",
         }
 
+class Minimap2_asm5(BaseSoftware):
+    EXE_PATH = {"default": join_path(USER_BASE, "miniconda3/envs/bio/bin/minimap2")}
+
+    def __init__(self, logger, version="default"):
+        super().__init__(logger, version)
+
+        self.BASE_PARAMS = ["target", "output", "query", "thread"]
+        self.BASE_CMD = "{exe_path} -t {thread} -x asm5 -Y --secondary=yes -N 1 --cs -c --paf-no-hit {target} {query} > {output}"
+        self.RUN_PARAMS = {
+            "target": "{path}/{name}.fa",
+            "query": "{path}/{name}.fa",
+            "thread": "48",
+            "output": "{path}/{name}.paf",
+        }
+
 
 class Minimap2_hifi(BaseSoftware):
     EXE_PATH = {"default": join_path(USER_BASE, "miniconda3/envs/bio/bin/minimap2")}
